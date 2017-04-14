@@ -44,6 +44,8 @@ from supervisor import xmlrpc
 from supervisor import states
 from supervisor import http_client
 
+from multiprocessing import Pool
+
 class LSBInitErrorCode:
     GENERIC = 1
     INVALID_ARGS = 2
@@ -838,7 +840,7 @@ class DefaultControllerPlugin(ControllerPluginBase):
             for result in results:
                 self.ctl.handle_xmlrpc_fault_state(self._stopresult, result, xmlrpc.Faults.NOT_RUNNING)
         else:
-            for name in names:
+            def stop_process(name):
                 group_name, process_name = split_namespec(name)
                 if process_name is None:
                     try:
@@ -864,6 +866,8 @@ class DefaultControllerPlugin(ControllerPluginBase):
                     else:
                         name = make_namespec(group_name, process_name)
                         self.ctl.output('%s: stopped' % name)
+            p = Pool(len(names))
+            p.map(stop_process, names)
 
     def help_stop(self):
         self.ctl.output("stop <name>\t\tStop a process")
