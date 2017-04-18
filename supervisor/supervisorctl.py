@@ -44,7 +44,7 @@ from supervisor import xmlrpc
 from supervisor import states
 from supervisor import http_client
 
-from multiprocessing import Pool
+from pathos.multiprocessing import ProcessingPool as Pool
 
 class LSBInitErrorCode:
     GENERIC = 1
